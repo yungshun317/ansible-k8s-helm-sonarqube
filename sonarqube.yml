@@ -17,3 +17,18 @@
       with_items:
         - sonarqube-values.yml
         - sonarqube-pv.yml
+  
+    - name: Initialize persistent volumes
+      shell: "kubectl create -f sonarqube-pv.yml"
+      environment: 
+        KUBECONFIG: /home/ccma/.kube/config
+
+    - name: Install SonarQube by Helm
+      shell: "helm install --name sonarqube -f sonarqube-values.yml stable/sonarqube"
+      environment:
+        KUBECONFIG: /home/ccma/.kube/config
+      register: install_sonarqube
+
+    - name: Debug install_sonarqube
+      debug:
+        var: install_sonarqube
