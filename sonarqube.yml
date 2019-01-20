@@ -1,0 +1,19 @@
+---
+- name: sonarqube
+  hosts: master1
+  gather_facts: no
+
+  vars: 
+    ansible_become_pass: "ccma"
+
+  tasks:
+    - name: Copy multiple .yml files to remote
+      copy: 
+        src: "{{ item }}"
+        dest: "/home/ccma/{{ item }}"
+        owner: ccma
+        group: ccma
+        mode: 0644
+      with_items:
+        - sonarqube-values.yml
+        - sonarqube-pv.yml
