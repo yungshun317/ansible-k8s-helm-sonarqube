@@ -1,0 +1,6 @@
+1. postgresql persistence
+create postgres-pv
+modify charts/postgresql/values.yaml StorageClass
+
+2. 
+$ helm install --dry-run --name sonarqube ./sonarqube

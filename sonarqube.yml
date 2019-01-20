@@ -15,7 +15,7 @@
         group: ccma
         mode: 0644
       with_items:
-        - sonarqube-values.yml
+        - sonarqube/
         - sonarqube-pv.yml
   
     - name: Initialize persistent volumes
@@ -24,7 +24,7 @@
         KUBECONFIG: /home/ccma/.kube/config
 
     - name: Install SonarQube by Helm
-      shell: "helm install --name sonarqube -f sonarqube-values.yml stable/sonarqube"
+      shell: "helm install --name sonarqube ./sonarqube"
       environment:
         KUBECONFIG: /home/ccma/.kube/config
       register: install_sonarqube
