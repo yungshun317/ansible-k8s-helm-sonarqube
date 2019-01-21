@@ -1,4 +1,24 @@
 ---
+- name: sonarqube-directories
+  hosts: ccma
+  gather_facts: no
+
+  vars: 
+    ansible_become_pass: "ccma"
+
+  tasks:
+    - name: Create directory for postgresql-pv
+      file:
+        path: /home/ccma/data/postgresql-data
+        state: directory
+        mode: 0755
+   
+    - name: Create directory for sonarqube-pv
+      file:
+        path: /home/ccma/data/sonarqube-data
+        state: directory
+        mode: 0755 
+
 - name: sonarqube
   hosts: master1
   gather_facts: no
@@ -17,11 +37,29 @@
       with_items:
         - sonarqube/
         - sonarqube-pv.yml
-  
-    - name: Initialize persistent volumes
+        - postgresql-pv.yml
+
+    - name: Initialize persistent volumes for postgresql
+      shell: "kubectl create -f postgresql-pv.yml"
+      environment: 
+        KUBECONFIG: /home/ccma/.kube/config
+
+    - name: Initialize persistent volumes for sonarqube
       shell: "kubectl create -f sonarqube-pv.yml"
       environment: 
         KUBECONFIG: /home/ccma/.kube/config
+
+    - name: Download postgresql chart 
+      shell: "helm dependency update"
+      args:
+        chdir: /home/ccma/sonarqube
+      environment: 
+        KUBECONFIG: /home/ccma/.kube/config
+      register: download_postgresql_dependency
+
+    - name: Debug download_postgresql_dependency
+      debug:
+        var: download_postgresql_dependency
 
     - name: Install SonarQube by Helm
       shell: "helm install --name sonarqube ./sonarqube"
